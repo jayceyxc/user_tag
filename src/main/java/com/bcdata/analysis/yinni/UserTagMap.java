@@ -39,11 +39,11 @@ public class UserTagMap extends Mapper<Object, Text, Text, Text> {
             }
             return;
         }
-        String adsl = segs[ADSL_INDEX];
+        String adsl = segs[ADSL_INDEX].trim ();
         String sourceIp = segs[IP_INDEX];
         String url = Utils.urlFormat (segs[URL_INDEX].trim ());
         String refer = Utils.urlFormat (segs[REFER_INDEX].trim ());
-        String userAgent = segs[UA_INDEX];
+        String userAgent = segs[UA_INDEX].trim ();
         String timestamp = segs[TIMESTAMP_INDEX];
 
 
@@ -53,43 +53,35 @@ public class UserTagMap extends Mapper<Object, Text, Text, Text> {
 
         Set<String> finalTagSet = new TreeSet<String> ();
         List<AhoCorasickDoubleArrayTrie<List<String>>.Hit<List<String>>> tagList = ac.parseText (url);
-        if (tagList != null) {
+        if (!tagList.isEmpty ()) {
             for (AhoCorasickDoubleArrayTrie<List<String>>.Hit<List<String>> hit : tagList) {
-                for (String tag : hit.value) {
-                    finalTagSet.add (tag);
-                }
+                finalTagSet.addAll (hit.value);
             }
         }
 
         tagList.clear ();
         tagList = ac.parseText (refer);
-        if (tagList != null) {
+        if (!tagList.isEmpty ()) {
             for (AhoCorasickDoubleArrayTrie<List<String>>.Hit<List<String>> hit : tagList) {
-                for (String tag : hit.value) {
-                    finalTagSet.add (tag);
-                }
+                finalTagSet.addAll (hit.value);
             }
         }
 
         tagList.clear ();
         String host = Utils.urlToHost (url);
         tagList = ac.parseText (host);
-        if (tagList != null) {
+        if (!tagList.isEmpty ()) {
             for (AhoCorasickDoubleArrayTrie<List<String>>.Hit<List<String>> hit : tagList) {
-                for (String tag : hit.value) {
-                    finalTagSet.add (tag);
-                }
+                finalTagSet.addAll (hit.value);
             }
         }
 
         tagList.clear ();
         String referHost = Utils.urlToHost (refer);
         tagList = ac.parseText (referHost);
-        if (tagList != null) {
+        if (!tagList.isEmpty ()) {
             for (AhoCorasickDoubleArrayTrie<List<String>>.Hit<List<String>> hit : tagList) {
-                for (String tag : hit.value) {
-                    finalTagSet.add (tag);
-                }
+                finalTagSet.addAll (hit.value);
             }
         }
         for (String tag : finalTagSet) {

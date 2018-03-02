@@ -1,8 +1,8 @@
 package com.bcdata.analysis.yinni;
 
-import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
@@ -10,6 +10,8 @@ import org.apache.hadoop.util.GenericOptionsParser;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class UserTagMain {
     private static final Logger logger = Logger.getLogger (UserTagMain.class);
@@ -296,15 +298,18 @@ public class UserTagMain {
 //        PropertyConfigurator.configure ("log4j.properties");
 
         try {
-            Configuration conf = new Configuration ();
+            JobConf jobConf = new JobConf ();
+            jobConf.setNumMapTasks (10);
+            jobConf.setNumReduceTasks (10);
+//            Configuration conf = new Configuration ();
 //            conf.set ("fs.defaultFS", "hdfs://192.168.3.110:8020");
 //            conf.addResource (IOUtils.toInputStream (FileUtils.readFileToString (new File ("url_tags.txt"), "utf8")));
-            String[] otherArgs = new GenericOptionsParser (conf, args).getRemainingArgs ();
+            String[] otherArgs = new GenericOptionsParser (jobConf, args).getRemainingArgs ();
             if (otherArgs.length < 2) {
                 System.err.println ("Usage: user tag <in> [<in>...] <out>");
                 System.exit (2);
             }
-            Job job = Job.getInstance (conf, "user tag");
+            Job job = Job.getInstance (jobConf, "user tag");
             job.setJarByClass (UserTagMain.class);
             job.setMapperClass (UserTagMap.class);
 //            job.setCombinerClass (DPCReducer.class);
@@ -314,10 +319,14 @@ public class UserTagMain {
             job.setOutputKeyClass (Text.class);
             job.setOutputValueClass (Text.class);
 
+
+            List<String> inputPaths = new ArrayList<String> ();
             for (int i = 0; i < otherArgs.length - 1; ++i) {
                 System.out.println ("input file path: " + otherArgs[i]);
-                FileInputFormat.addInputPath (job, new Path (otherArgs[i]));
+                inputPaths.add (otherArgs[i]);
             }
+
+            FileInputFormat.setInputPaths (job, String.join (",", inputPaths));
 
             String outfilePath = otherArgs[otherArgs.length - 1];
 //            OperatingFiles.deleteHDFSFile(outfilePath);
@@ -325,7 +334,7 @@ public class UserTagMain {
             System.out.println ("outfilePath: " + outfilePath);
             FileOutputFormat.setOutputPath (job, new Path (outfilePath));
             job.waitForCompletion (true);
-            System.out.println("Job ended: ");
+            System.out.println ("Job ended: ");
         } catch (ClassNotFoundException cnfe) {
             logger.error (cnfe.getMessage (), cnfe);
         } catch (IOException ioe) {
