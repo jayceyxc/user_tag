@@ -23,7 +23,7 @@ public class UserTagReducer extends Reducer<Text, Text, Text, Text> {
     private static void normalization (Map<String, BigDecimal> tagValueMap) {
         BigDecimal sum = BigDecimal.ZERO;
         for (BigDecimal weight : tagValueMap.values ()) {
-            sum = sum.add (weight);
+            sum = sum.add (BigDecimal.valueOf(Math.sqrt (weight.doubleValue ())));
         }
 //        System.err.println (String.format ("map size: %d, sum: %f", tagValueMap.size (), sum.doubleValue ()));
 
