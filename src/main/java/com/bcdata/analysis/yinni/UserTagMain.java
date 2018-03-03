@@ -299,8 +299,8 @@ public class UserTagMain {
 
         try {
             JobConf jobConf = new JobConf ();
-            jobConf.setNumMapTasks (10);
-            jobConf.setNumReduceTasks (10);
+            jobConf.setNumMapTasks (20);
+            jobConf.setNumReduceTasks (20);
 //            Configuration conf = new Configuration ();
 //            conf.set ("fs.defaultFS", "hdfs://192.168.3.110:8020");
 //            conf.addResource (IOUtils.toInputStream (FileUtils.readFileToString (new File ("url_tags.txt"), "utf8")));
