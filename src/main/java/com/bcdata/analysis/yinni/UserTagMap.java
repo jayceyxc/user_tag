@@ -25,7 +25,7 @@ public class UserTagMap extends Mapper<Object, Text, Text, Text> {
     private static final int COOKIE_INDEX = 5;
     private static final int TIMESTAMP_INDEX = 6;
 
-    private static final AhoCorasickDoubleArrayTrie<List<String>> ac = Utils.buildACMachine ();
+    private static final AhoCorasickDoubleArrayTrie<List<String>> ac = Utils.buildACMachine (Utils.URL_TAGS_FILE_NAME);
 
     @Override
     public void map(Object key, Text value, Context context) throws IOException, InterruptedException {

@@ -1,6 +1,7 @@
 package com.bcdata.analysis.yinni;
 
 import com.hankcs.algorithm.AhoCorasickDoubleArrayTrie;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
@@ -15,8 +16,8 @@ import java.util.TreeMap;
 public class Utils {
     private static final Logger logger = Logger.getLogger (Utils.class);
 
-    private static final String DATA_FILE_PATH = "data";
-    private static final String URL_TAGS_FILE_NAME = "url_tags.txt";
+    public static final String DATA_FILE_PATH = "data";
+    public static final String URL_TAGS_FILE_NAME = "url_tags.txt";
     public static final String URL_TAGS_FILE = System.getProperty("user.dir") + System.getProperty("file.separator")
             + DATA_FILE_PATH + System.getProperty("file.separator") + URL_TAGS_FILE_NAME;
 
@@ -57,20 +58,21 @@ public class Utils {
         return urlHost;
     }
 
-    public static AhoCorasickDoubleArrayTrie<List<String>> buildACMachine() {
+    public static AhoCorasickDoubleArrayTrie<List<String>> buildACMachine(String filename) {
         try {
 
             TreeMap<String, List<String>> map = new TreeMap<String, List<String>>();
-            BufferedReader reader = new BufferedReader (new FileReader (URL_TAGS_FILE_NAME));
+            BufferedReader reader = new BufferedReader (new FileReader (filename));
             String line = null;
             while ((line = reader.readLine ()) != null) {
                 line = line.trim ();
-//                System.out.println (line);
-                String[] segs = line.split (":", 2);
-                if (segs.length == 2) {
-                    String urlPattern = urlFormat (segs[0].trim ());
-                    String[] tags = segs[1].trim ().split (",");
-//                    System.out.println ("put url: " + urlPattern);
+                System.out.println (line);
+                int index = StringUtils.lastIndexOf (line, ":");
+                if (index > 0) {
+                    String urlPattern = urlFormat (line.substring (0, index).trim ());
+                    line = line.substring (index + 1);
+                    String[] tags = line.trim ().split (",");
+                    System.out.println ("put url: " + urlPattern);
                     map.put (urlPattern, Arrays.asList (tags));
                 }
             }
@@ -118,7 +120,7 @@ public class Utils {
         System.out.println (urlFormat (url));
 
         logger.info ("begin buildACMachine");
-        AhoCorasickDoubleArrayTrie<List<String>> ac = buildACMachine();
+        AhoCorasickDoubleArrayTrie<List<String>> ac = buildACMachine(URL_TAGS_FILE);
         logger.info ("finish buildACMachine");
         url = "http://ad.afy11.net/aaa.html";
         List<AhoCorasickDoubleArrayTrie<List<String>>.Hit<List<String>>> tagList = ac.parseText (url);
