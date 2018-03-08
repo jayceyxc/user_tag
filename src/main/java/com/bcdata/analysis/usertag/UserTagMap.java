@@ -1,5 +1,6 @@
-package com.bcdata.analysis.yinni;
+package com.bcdata.analysis.usertag;
 
+import com.bcdata.analysis.utils.Utils;
 import com.hankcs.algorithm.AhoCorasickDoubleArrayTrie;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;

@@ -1,4 +1,4 @@
-package com.bcdata.analysis.yinni;
+package com.bcdata.analysis.utils;
 
 import java.io.IOException;
 import java.net.URI;

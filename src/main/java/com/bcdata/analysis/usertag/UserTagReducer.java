@@ -1,4 +1,4 @@
-package com.bcdata.analysis.yinni;
+package com.bcdata.analysis.usertag;
 
 import org.apache.commons.cli.*;
 import org.apache.hadoop.io.Text;

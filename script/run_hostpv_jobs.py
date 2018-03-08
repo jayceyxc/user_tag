@@ -74,16 +74,18 @@ if not input_files:
     exit(-1)
 
 job_time = datetime.datetime.strptime(job_day, '%Y%m%d')
-prev_day_time = job_time + datetime.timedelta(days=-1)
-prev_day = prev_day_time.strftime('%Y%m%d')
-prev_files = get_mr_in_path.get_prev_output_files(day=prev_day, out_path=OUT_PATH)
-print 'ARG prev_files: ', prev_files
-if prev_files:
-    input_files = ','.join([input_files, prev_files])
+for i in range(-1, -7, -1):
+    prev_day_time = job_time + datetime.timedelta(days=i)
+    prev_day = prev_day_time.strftime('%Y%m%d')
+    prev_files = get_mr_in_path.generate_input_files(day=prev_day)
+    print 'ARG prev_files: ', prev_files
+
+    if prev_files:
+        input_files = ','.join([input_files, prev_files])
 
 print 'FINAL input files: ', input_files
 
-query_job = subprocess.Popen(['sh', current_path + 'job.sh', job_day, OUT_PATH, input_files])
+query_job = subprocess.Popen(['sh', current_path + 'hostpv_job.sh', job_day, OUT_PATH, input_files])
 # query_job = subprocess.Popen(['echo', province, input_files])
 all_query_jobs.add(query_job)
 batch_process.add(query_job)
