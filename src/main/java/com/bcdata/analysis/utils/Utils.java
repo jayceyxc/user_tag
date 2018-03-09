@@ -21,10 +21,35 @@ public class Utils {
     public static final String URL_TAGS_FILE_NAME = "url_tags.txt";
     public static final String URL_TAGS_FILE = System.getProperty ("user.dir") + System.getProperty ("file.separator")
             + DATA_FILE_PATH + System.getProperty ("file.separator") + URL_TAGS_FILE_NAME;
+    public static final String DOMAIN_SUFFIX_FILE_NAME = "domain.txt";
 
     private static final String HTTP_PREFIX = "http://";
     private static final String HTTPS_PREFIX = "https://";
     private static final String WWW_PREFIX = "www.";
+
+    private static Set<String> suffixSet = loadDomainSuffix (DOMAIN_SUFFIX_FILE_NAME);
+
+    public static Set<String> loadDomainSuffix(String filename) {
+        try {
+
+            Set<String> suffixSet = new TreeSet<String> ();
+            BufferedReader reader = new BufferedReader (new FileReader (filename));
+            String line = null;
+            while ((line = reader.readLine ()) != null) {
+                line = line.trim ();
+                suffixSet.add (line);
+
+            }
+
+            return suffixSet;
+        } catch (FileNotFoundException fnfe) {
+            logger.error ("File not found");
+        } catch (IOException ioe) {
+            logger.error ("Read file failed");
+        }
+
+        return null;
+    }
 
     public static String urlFormat (String url) {
         if (url.startsWith (HTTP_PREFIX)) {
@@ -57,6 +82,66 @@ public class Utils {
         String urlHost = url.split ("/")[0];
 
         return urlHost;
+    }
+
+    public static boolean isIpStr(String host) {
+        String[] tokens = host.split ("\\.");
+        if (tokens.length != 4) {
+//            System.out.println ("length is not 4");
+            return false;
+        }
+        boolean isIp = true;
+        for (String token : tokens) {
+            if (StringUtils.isNumeric (token)) {
+                try {
+                    int value = Integer.valueOf (token);
+                    if (value < 0 || value > 255) {
+                        //                    System.out.println ("value beyond 0 and 255");
+                        isIp = false;
+                        break;
+                    }
+                } catch (NumberFormatException nfe) {
+                    System.out.println ("invalid number in host: " + host);
+                }
+            } else {
+//                System.out.println ("token is not number");
+                isIp = false;
+                break;
+            }
+        }
+        return isIp;
+    }
+
+
+    public static String hostToDomain(String hostName) {
+        String host = "";
+        int port;
+        if (hostName.contains (":")) {
+            String[] tokens = hostName.split (":");
+            if (tokens.length == 2 && StringUtils.isNumeric (tokens[1])) {
+                host = tokens[0];
+                port = Integer.valueOf (tokens[1]);
+            }
+        } else {
+            host = hostName;
+        }
+
+        if (isIpStr (host)) {
+            return host;
+        }
+
+        String[] tokens = host.split ("\\.");
+        List<String> domainTokens = new ArrayList<> ();
+        for (int i = tokens.length - 1; i >= 0; i--) {
+            domainTokens.add (tokens[i]);
+            if (!suffixSet.contains (tokens[i])) {
+                break;
+            }
+        }
+
+        Collections.reverse (domainTokens);
+
+        return String.join (".", domainTokens);
     }
 
     public static void parseUrl (String url, Map<String, String> urlMap) {
@@ -240,5 +325,18 @@ public class Utils {
         for (Map.Entry<String, String> entry : cookieMap.entrySet ()) {
             System.out.println (entry.getKey () + ": " + entry.getValue ());
         }
+
+        String host = "www.baidu.com.cn";
+        System.out.println (isIpStr (host));
+        System.out.println (hostToDomain (host));
+        host = "127.9.0.1";
+        System.out.println (isIpStr (host));
+        System.out.println (hostToDomain (host));
+        host = "1232.232.444.424";
+        System.out.println (isIpStr (host));
+        System.out.println (hostToDomain (host));
+        host = "sports.sina.com.cn";
+        System.out.println (isIpStr (host));
+        System.out.println (hostToDomain (host));
     }
 }

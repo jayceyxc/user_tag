@@ -1,9 +1,9 @@
 package com.bcdata.analysis.idfa;
 
 import com.bcdata.analysis.utils.Utils;
-import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.hadoop.mapreduce.lib.input.FileSplit;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -29,6 +29,10 @@ public class IDFAMapper extends Mapper<Object, Text, Text, Text> {
 
     @Override
     protected void map (Object key, Text value, Context context) throws IOException, InterruptedException {
+        FileSplit fileSplit = (FileSplit) context.getInputSplit ();
+        String fileName = fileSplit.getPath ().getName ();
+        System.out.println (fileName);
+
         String[] segs = value.toString().split(SEPERATOR);
         if (segs.length < MIN_SEGS_LENGTH) {
             return;

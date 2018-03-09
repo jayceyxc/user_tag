@@ -26,7 +26,8 @@ public class HostPVMapper extends Mapper<Object, Text, Text, IntWritable> {
 
         String url = Utils.urlFormat (segs[URL_INDEX].trim ());
         String host = Utils.urlToHost (url);
+        String domain = Utils.hostToDomain (host);
 
-        context.write(new Text(host), one);
+        context.write(new Text(domain), one);
     }
 }
