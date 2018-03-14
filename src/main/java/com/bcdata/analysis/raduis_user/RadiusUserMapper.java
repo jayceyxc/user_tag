@@ -41,5 +41,11 @@ public class RadiusUserMapper extends Mapper<Object, Text, CompositeKey, IntWrit
         }
 
         context.write(new CompositeKey (dasName, adsl), one);
+
+        if (dasName.equals ("das1") || dasName.equals ("das2")) {
+            context.write (new CompositeKey ("das12", adsl), one);
+        } else if (dasName.equals ("das3") || dasName.equals ("das4")) {
+            context.write (new CompositeKey ("das34", adsl), one);
+        }
     }
 }

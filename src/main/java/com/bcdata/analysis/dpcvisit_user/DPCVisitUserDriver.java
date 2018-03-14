@@ -23,7 +23,7 @@ public class DPCVisitUserDriver {
         try {
             JobConf jobConf = new JobConf ();
             jobConf.setNumMapTasks (20);
-            jobConf.setNumReduceTasks (5);
+            jobConf.setNumReduceTasks (10);
 //            Configuration conf = new Configuration ();
 //            conf.set ("fs.defaultFS", "hdfs://192.168.3.110:8020");
 //            conf.addResource (IOUtils.toInputStream (FileUtils.readFileToString (new File ("url_tags.txt"), "utf8")));
