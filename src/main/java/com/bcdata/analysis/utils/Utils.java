@@ -83,7 +83,8 @@ public class Utils {
         try {
             return url.split ("/")[0];
         } catch (ArrayIndexOutOfBoundsException aioobe) {
-            logger.error (url + ", exception message: " + aioobe.getMessage (), aioobe);
+            System.err.println (url + ", exception message: " + aioobe.getMessage ());
+            aioobe.printStackTrace ();
         }
 
         return url;
@@ -306,7 +307,7 @@ public class Utils {
         url = "https://";
         System.out.println (urlFormat (url));
         System.out.println (urlToHost (url));
-        url = "";
+        url = "//";
         System.out.println (urlFormat (url));
         System.out.println (urlToHost (url));
         url = "http://\\";
