@@ -29,7 +29,7 @@ public class Utils {
 
     private static Set<String> suffixSet = loadDomainSuffix (DOMAIN_SUFFIX_FILE_NAME);
 
-    public static Set<String> loadDomainSuffix(String filename) {
+    public static Set<String> loadDomainSuffix (String filename) {
         try {
 
             Set<String> suffixSet = new TreeSet<String> ();
@@ -79,12 +79,17 @@ public class Utils {
         } else if (url.startsWith (HTTPS_PREFIX)) {
             url = url.substring (HTTPS_PREFIX.length ());
         }
-        String urlHost = url.split ("/")[0];
 
-        return urlHost;
+        try {
+            return url.split ("/")[0];
+        } catch (ArrayIndexOutOfBoundsException aioobe) {
+            logger.error (url + ", exception message: " + aioobe.getMessage (), aioobe);
+        }
+
+        return url;
     }
 
-    public static boolean isIpStr(String host) {
+    public static boolean isIpStr (String host) {
         String[] tokens = host.split ("\\.");
         if (tokens.length != 4) {
 //            System.out.println ("length is not 4");
@@ -113,7 +118,7 @@ public class Utils {
     }
 
 
-    public static String hostToDomain(String hostName) {
+    public static String hostToDomain (String hostName) {
         String host = "";
         int port;
         if (hostName.contains (":")) {
@@ -198,13 +203,13 @@ public class Utils {
             String line = null;
             while ((line = reader.readLine ()) != null) {
                 line = line.trim ();
-                System.out.println (line);
+//                System.out.println (line);
                 int index = StringUtils.lastIndexOf (line, ":");
                 if (index > 0) {
                     String urlPattern = urlFormat (line.substring (0, index).trim ());
                     line = line.substring (index + 1);
                     String[] tags = line.trim ().split (",");
-                    System.out.println ("put url: " + urlPattern);
+//                    System.out.println ("put url: " + urlPattern);
                     map.put (urlPattern, Arrays.asList (tags));
                 }
             }
@@ -294,8 +299,19 @@ public class Utils {
 
         String url = "http://www.baidu.com";
         System.out.println (urlFormat (url));
+        System.out.println (urlToHost (url));
         url = "https://mail.163.com";
         System.out.println (urlFormat (url));
+        System.out.println (urlToHost (url));
+        url = "https://";
+        System.out.println (urlFormat (url));
+        System.out.println (urlToHost (url));
+        url = "";
+        System.out.println (urlFormat (url));
+        System.out.println (urlToHost (url));
+        url = "http://\\";
+//        System.out.println (urlFormat (url));
+        System.out.println (urlToHost (url));
 
         logger.info ("begin buildACMachine");
         AhoCorasickDoubleArrayTrie<List<String>> ac = buildACMachine (URL_TAGS_FILE);
@@ -314,7 +330,7 @@ public class Utils {
         String cookie = "UOR=115.29.173.59:9988,www.sina.com.cn,; SGUID=1517802309476_82399729; SINAGLOBAL=115.29.165.122_1517802310.450373; SUB=_2AkMtJvXWf8NxqwJRmPAVxWjlb4RzywHEieKbegQNJRMyHRl-yD83qhxatRB6BqbbOXbEmeUJcos3Fh9gVX_xdf4wd0Gx; SUBP=0033WrSXqPxfM72-Ws9jqgMF55529P9D9WhNMfP5Jn0YR6vdYsvud2Lr; CNZZDATA5580073=cnzz_eid%3D1984850260-1517797911-null%26ntime%3D1517997642; __utmz=269849203.1519397786.7.7.utmcsr=tianya.cn|utmccn=(referral)|utmcmd=referral|utmcct=/m/; U_TRS1=00000028.55141b35.5a952b99.85ea4f16; lxlrtst=1519814943_o; lxlrttp=1519814943; Apache=115.29.165.122_1520482424.514481; ULV=1520482425779:10:2:2:115.29.165.122_1520482424.514481:1520482424101; CNZZDATA1271230489=292927634-1517800554-null%7C1520478855; __utma=269849203.1450120486.1517815485.1519822170.1520482428.11; __utmc=269849203; __utmb=269849203.1.10.1520482428";
         Map<String, String> urlMap = new HashMap<String, String> ();
         Utils.parseUrl (url, urlMap);
-        Set<Map.Entry<String,String>> entries = urlMap.entrySet ();
+        Set<Map.Entry<String, String>> entries = urlMap.entrySet ();
         for (Map.Entry<String, String> entry : urlMap.entrySet ()) {
             System.out.println (entry.getKey () + ": " + entry.getValue ());
         }
