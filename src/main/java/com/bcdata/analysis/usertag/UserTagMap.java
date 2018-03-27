@@ -6,6 +6,7 @@ import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 
+import javax.rmi.CORBA.Util;
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
@@ -26,7 +27,8 @@ public class UserTagMap extends Mapper<Object, Text, Text, Text> {
     private static final int COOKIE_INDEX = 5;
     private static final int TIMESTAMP_INDEX = 6;
 
-    private static final AhoCorasickDoubleArrayTrie<List<String>> ac = Utils.buildACMachine (Utils.URL_TAGS_FILE_NAME);
+    private static final AhoCorasickDoubleArrayTrie<List<String>> urlsAc = Utils.buildUrlTagsACMachine (Utils.URL_TAGS_FILE_NAME);
+    private static final AhoCorasickDoubleArrayTrie<List<String>> uaAc = Utils.buildUserAgentACMachine (Utils.UA_TAGS_FILE_NAME);
 
     @Override
     public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
@@ -53,7 +55,7 @@ public class UserTagMap extends Mapper<Object, Text, Text, Text> {
         }
 
         Set<String> finalTagSet = new TreeSet<String> ();
-        List<AhoCorasickDoubleArrayTrie<List<String>>.Hit<List<String>>> tagList = ac.parseText (url);
+        List<AhoCorasickDoubleArrayTrie<List<String>>.Hit<List<String>>> tagList = urlsAc.parseText (url);
         if (!tagList.isEmpty ()) {
             for (AhoCorasickDoubleArrayTrie<List<String>>.Hit<List<String>> hit : tagList) {
                 finalTagSet.addAll (hit.value);
@@ -61,7 +63,7 @@ public class UserTagMap extends Mapper<Object, Text, Text, Text> {
         }
 
         tagList.clear ();
-        tagList = ac.parseText (refer);
+        tagList = urlsAc.parseText (refer);
         if (!tagList.isEmpty ()) {
             for (AhoCorasickDoubleArrayTrie<List<String>>.Hit<List<String>> hit : tagList) {
                 finalTagSet.addAll (hit.value);
@@ -70,7 +72,7 @@ public class UserTagMap extends Mapper<Object, Text, Text, Text> {
 
         tagList.clear ();
         String host = Utils.urlToHost (url);
-        tagList = ac.parseText (host);
+        tagList = urlsAc.parseText (host);
         if (!tagList.isEmpty ()) {
             for (AhoCorasickDoubleArrayTrie<List<String>>.Hit<List<String>> hit : tagList) {
                 finalTagSet.addAll (hit.value);
@@ -79,12 +81,21 @@ public class UserTagMap extends Mapper<Object, Text, Text, Text> {
 
         tagList.clear ();
         String referHost = Utils.urlToHost (refer);
-        tagList = ac.parseText (referHost);
+        tagList = urlsAc.parseText (referHost);
         if (!tagList.isEmpty ()) {
             for (AhoCorasickDoubleArrayTrie<List<String>>.Hit<List<String>> hit : tagList) {
                 finalTagSet.addAll (hit.value);
             }
         }
+
+        tagList.clear ();
+        tagList = uaAc.parseText (userAgent);
+        if (!tagList.isEmpty ()) {
+            for (AhoCorasickDoubleArrayTrie<List<String>>.Hit<List<String>> hit : tagList) {
+                finalTagSet.addAll (hit.value);
+            }
+        }
+
         for (String tag : finalTagSet) {
             context.write (new Text(adsl), new Text(tag));
         }
