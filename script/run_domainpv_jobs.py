@@ -73,15 +73,15 @@ if not input_files:
     print 'no files, job will not start.'
     exit(-1)
 
-job_time = datetime.datetime.strptime(job_day, '%Y%m%d')
-for i in range(-1, -7, -1):
-    prev_day_time = job_time + datetime.timedelta(days=i)
-    prev_day = prev_day_time.strftime('%Y%m%d')
-    prev_files = get_mr_in_path.generate_input_files(day=prev_day)
-    print 'ARG prev_files: ', prev_files
-
-    if prev_files:
-        input_files = ','.join([input_files, prev_files])
+# job_time = datetime.datetime.strptime(job_day, '%Y%m%d')
+# for i in range(-1, -7, -1):
+#     prev_day_time = job_time + datetime.timedelta(days=i)
+#     prev_day = prev_day_time.strftime('%Y%m%d')
+#     prev_files = get_mr_in_path.generate_input_files(day=prev_day)
+#     print 'ARG prev_files: ', prev_files
+#
+#     if prev_files:
+#         input_files = ','.join([input_files, prev_files])
 
 print 'FINAL input files: ', input_files
 

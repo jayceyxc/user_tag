@@ -58,7 +58,7 @@ public class IDFAMapper extends Mapper<Object, Text, Text, Text> {
             if (entry.getKey ().equals ("idfa")) {
                 if (pattern.matcher (entry.getValue ()).matches ()) {
                     mapKeyword.set (adsl);
-                    mapValue.set (entry.getValue ());
+                    mapValue.set (entry.getValue ().toUpperCase ());
                     context.write (mapKeyword, mapValue);
                 }
             }

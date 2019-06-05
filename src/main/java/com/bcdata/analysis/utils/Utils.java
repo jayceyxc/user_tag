@@ -238,11 +238,14 @@ public class Utils {
                 line = line.trim ();
                 int index = StringUtils.lastIndexOf (line, ":");
                 if (index > 0) {
-                    String urlPattern = urlFormat (line.substring (0, index).trim ());
+                    String uaPattern = line.substring (0, index);
+                    if (!uaPattern.equals (" MI ")) {
+                        uaPattern = uaPattern.trim ();
+                    }
                     line = line.substring (index + 1);
                     String[] tokens = line.trim ().split (",");
 //                    System.out.println ("put url: " + urlPattern);
-                    map.put (urlPattern, Arrays.asList (tokens));
+                    map.put (uaPattern, Arrays.asList (tokens));
                 }
             }
             AhoCorasickDoubleArrayTrie<List<String>> acdat = new AhoCorasickDoubleArrayTrie<List<String>> ();
